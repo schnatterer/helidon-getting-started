@@ -13,9 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# Define helidon image version for all stages
+FROM helidon/jdk8-graalvm-maven:1.0.0-rc13 as build-img
+
+# Cache maven dependencies. Only reload maven dependencies when pom changes.
+FROM build-img as mavencache
+ENV MAVEN_OPTS=-Dmaven.repo.local=/mvn
+COPY pom.xml /mvn/
+WORKDIR /mvn
+RUN mvn package dependency:resolve dependency:resolve-plugins
 
 # 1st stage, build the app
-FROM helidon/jdk8-graalvm-maven:1.0.0-rc13 as build
+FROM build-img as build
+ENV MAVEN_OPTS=-Dmaven.repo.local=/mvn
+COPY --from=mavencache /mvn/ /mvn/
 
 WORKDIR /helidon
 
