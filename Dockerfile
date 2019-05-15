@@ -50,6 +50,8 @@ WORKDIR /helidon
 # Copy the binary built in the 1st stage
 COPY --from=build /helidon/target/helidon-quickstart .
 
+USER 1000
+
 ENTRYPOINT ["./helidon-quickstart"]
 
 EXPOSE 8080
